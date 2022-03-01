@@ -33,29 +33,27 @@ def part_of_speech(text):
     # print('The following NER tags are found:')
     # iterate over entities and print
     count = 0
+    pos1 = []
+
 
     for entity in sentence.get_spans('pos'):
 
         for token in entity:
-            #print(dir(token))
-            # labels
-            # Prints the word with the index of the word
-            # print(token) 
-
-            # Prints the part of speech of the word with the probability that the word
-            # is actually that part of speech in the sentence
-            # print(token.labels)
-
             # Put each piece into df
-            pos_df.iloc[count, 0] = str(token)
-            pos_df.iloc[count, 1] = token.labels
-
-            #print(pos_df.iloc[count, 1])
+            pos1.append([token, token.labels])
 
             count += 1
 
-    # print(count)
 
-    # pos_df.to_csv('pos.csv', sep='\t')
+    pos_df = pd.DataFrame(pos1, columns=column_names)
+    #pos_df['text'] = pos_df['text'].iloc[-1]
+    print(pos_df)
+
+    #pos_df[['token','word']] = pos_df["text"].str.split(" ", 1, expand=False)
+    pos_df['word'] = pos_df['word'].astype('string')
+    pos_df['word'] = pos_df['word'].str.split(' ').str[2]
+
+    pos_df.to_csv('pos.csv')
+
 
     return pos_df

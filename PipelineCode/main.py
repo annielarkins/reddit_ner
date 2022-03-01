@@ -38,7 +38,7 @@ pos_df = part_of_speech(abstract1)
 category_label = zero_shot_classification(abstract1)
 dictionary_kw = dictionary_comparison(abstract1)
 
-final_df = pos_df.set_index('word').join(in_df.set_index('word'))
+final_df = in_df.set_index('word').join(pos_df.set_index('word'))
 final_df.to_csv('test_results.csv')
 
 # app = FastAPI()
