@@ -1,18 +1,12 @@
-from tokenize import String
 from PredictionModel import PredictionModel
-import torch
 from transformers import AutoModelForTokenClassification
 from transformers import AutoTokenizer
-import pandas as pd
-import numpy as np
-from transformers import pipeline
-import itertools
-from operator import itemgetter
-from fastapi import FastAPI
-from pydantic import BaseModel
+
 from InternalQuestionAnswering import in_question_answering
 from ExternalQuestionAnswering import ex_question_answering
 from ZeroShotClassification import zero_shot_classification
+from PartOfSpeech import part_of_speech
+from DictionaryComparison import dictionary_comparison
 
 # Set up prediction model
 model_folder_path = "jasminejwebb/KeywordIdentifier"
@@ -35,13 +29,16 @@ test_model.createTokenizerAndModel(model_folder_path)
 abstract1 = """Many algorithms have been recently developed for reducing dimensionality by projecting data onto an intrinsic non-linear manifold. Unfortunately, existing algorithms often lose significant precision in this transformation. Manifold Sculpting is a new algorithm that iteratively reduces dimensionality by simulating surface tension in local neighborhoods. We present several experiments that show Manifold Sculpting yields more accurate results than existing algorithms with both generated and natural data-sets. Manifold Sculpting is also able to benefit from both prior dimensionality reduction efforts."""
 ab1_kw = test_model.predict(sentence = abstract1, output_csv='abstract_test1.csv')
 
-ex_df = ex_question_answering(abstract1, ab1_kw)
+# Word Level
+# ex_df = ex_question_answering(abstract1, ab1_kw)
 in_df = in_question_answering(abstract1, ab1_kw)
-category_label = zero_shot_classification(abstract1)
-# TODO - more things here
-#        Custom embeddings from corpus 
+pos_df = part_of_speech(abstract1)
 
-final_df = ex_df.set_index('word').join(in_df.set_index('word'))
+# Text Level
+category_label = zero_shot_classification(abstract1)
+dictionary_kw = dictionary_comparison(abstract1)
+
+final_df = pos_df.set_index('word').join(in_df.set_index('word'))
 final_df.to_csv('test_results.csv')
 
 # app = FastAPI()
